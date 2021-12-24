@@ -148,4 +148,35 @@ func GetAllTransactions(c *fiber.Ctx) error {
 		"last_page": last,
 		"limit":     limit,
 	})
+
+}
+
+func GetTransactionById(c *fiber.Ctx) error {
+	transactionCollection := config.MI.DB.Collection("transactions")
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
+	var transaction models.Transaction
+	objId, err := primitive.ObjectIDFromHex(c.Params("id"))
+	findResult := transactionCollection.FindOne(ctx, bson.M{"_id": objId})
+	if err := findResult.Err(); err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"success": false,
+			"message": "Transaction Not found",
+			"error":   err,
+		})
+	}
+
+	err = findResult.Decode(&transaction)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"success": false,
+			"message": "Transaction Not found",
+			"error":   err,
+		})
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    transaction,
+		"success": true,
+	})
 }

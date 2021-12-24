@@ -35,6 +35,7 @@ func setupRoutes(app *fiber.App) {
 
 	app.Get("/api/transactions/", controllers.GetAllTransactions)
 	app.Post("/api/transactions/:motorId/:customerId", controllers.AddTransaction)
+	app.Get("/api/transactions/:id", controllers.GetTransactionById)
 
 }
 

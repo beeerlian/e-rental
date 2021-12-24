@@ -155,17 +155,7 @@ func AddMotor(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	// updateCustomer := bson.M{
-	// 	"$set": customer,
-	// }
-	// _, err = customerCollection.UpdateOne(ctx, bson.M{"_id": customerObjId}, updateCustomer)
-	// if err != nil {
-	// 	return c.Status(500).JSON(fiber.Map{
-	// 		"success": false,
-	// 		"message": "Failed to add customerActivity",
-	// 		"error":   err.Error(),
-	// 	})
-	// }
+
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
 		"data":    result,
 		"success": true,
@@ -248,7 +238,6 @@ func RentMotor(c *fiber.Ctx) error {
 	var customer models.Customer
 	var motor models.Motor
 	var customerActivity models.CustomerActivity
-	var motorActivity models.MotorActivity
 
 	motorObjId, err := primitive.ObjectIDFromHex(c.Params("motorId"))
 	customerObjId, err := primitive.ObjectIDFromHex(c.Params("customerId"))
@@ -275,9 +264,7 @@ func RentMotor(c *fiber.Ctx) error {
 		})
 	}
 	customerActivity = models.CustomerActivity{MotorId: motor.ID, MotorType: motor.Type, Attende: "no"}
-	motorActivity = models.MotorActivity{CustomerId: customer.ID, Email: customer.Email, Attende: "no"}
 
-	motor.Participant = append(motor.Participant, motorActivity)
 	customer.Activities = append(customer.Activities, customerActivity)
 
 	updateMotor := bson.M{
@@ -311,59 +298,3 @@ func RentMotor(c *fiber.Ctx) error {
 		"message": "Customer joined successfully",
 	})
 }
-
-// func RentMotor(c *fiber.Ctx) error {
-// 	motorCollection := config.MI.DB.Collection("motors")
-// 	customerCollection := config.MI.DB.Collection("motors")
-// 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-
-// 	var participant models.Customer
-// 	var motor models.Motor
-// 	objId, err := primitive.ObjectIDFromHex(c.Params("motor-id"))
-// 	findResult := motorCollection.FindOne(ctx, bson.M{"_id": objId})
-// 	err = findResult.Decode(&motor)
-// 	if err := c.BodyParser(&participant); err != nil {
-// 		log.Println(err)
-// 		return c.Status(400).JSON(fiber.Map{
-// 			"success": false,
-// 			"message": "Failed to parse body",
-// 			"error":   err,
-// 		})
-// 	}
-// 	motor.Participant = append(motor.Participant, participant)
-// 	if err != nil {
-// 		return c.Status(500).JSON(fiber.Map{
-// 			"success": false,
-// 			"message": "Failed to get motor ID",
-// 			"error":   err.Error(),
-// 		})
-// 	}
-// 	updateMotor := bson.M{
-// 		"$set": motor,
-// 	}
-
-// 	_, err = motorCollection.UpdateOne(ctx, bson.M{"_id": objId}, updateMotor)
-// 	if err != nil {
-// 		return c.Status(500).JSON(fiber.Map{
-// 			"success": false,
-// 			"message": "Failed to add participant",
-// 			"error":   err.Error(),
-// 		})
-// 	}
-
-// 	updateCustomer := bson.M{
-// 		"$set": participant,
-// 	}
-// 	_, err = customerCollection.UpdateOne(ctx, bson.M{"_id": objId}, updateCustomer)
-// 	if err != nil {
-// 		return c.Status(500).JSON(fiber.Map{
-// 			"success": false,
-// 			"message": "Failed to add participant",
-// 			"error":   err.Error(),
-// 		})
-// 	}
-// 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{
-// 		"success": true,
-// 		"message": "Customer joined successfully",
-// 	})
-// }
